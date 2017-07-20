@@ -18,6 +18,3 @@ pep8:
 		pep8 kiva/
 
 lint: pep8
-
-
-.PHONY: install install-dev
