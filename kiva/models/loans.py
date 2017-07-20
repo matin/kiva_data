@@ -2,7 +2,7 @@ import json
 
 from sqlalchemy import Column, DateTime, Integer, String
 
-from kiva.client import Loan as LoanResource
+from kiva import client
 
 from .base import Base
 
@@ -23,12 +23,12 @@ class Loan(Base):
 
     @classmethod
     def create_from_id(cls, id_):
-        loan = LoanResource.retrieve(id_)
+        loan = client.Loan.retrieve(id_)
         return cls._create_from_dict(loan)
 
     @classmethod
     def create_from_ids(cls, ids):
-        loans = LoanResource.retrieve_ids(ids)
+        loans = client.Loan.retrieve_ids(ids)
         return [cls._create_from_dict(loan) for loan in loans]
 
     @classmethod
