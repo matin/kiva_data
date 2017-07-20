@@ -2,8 +2,6 @@ import json
 
 from sqlalchemy import Column, DateTime, Integer, String
 
-from kiva import client
-
 from .base import Base
 
 
@@ -22,19 +20,7 @@ class Loan(Base):
     api_response = Column(String, nullable=False)
 
     @classmethod
-    def create_from_id(cls, id_):
-        loan = client.Loan.retrieve(id_)
-        return cls._create_from_dict(loan)
-
-    @classmethod
-    def create_from_ids(cls, ids):
-        loans = client.Loan.retrieve_ids(ids)
-        return [cls._create_from_dict(loan) for loan in loans]
-
-    @classmethod
-    def _create_from_dict(cls, loan_dict):
-        if not loan_dict:
-            raise Exception('No data was returned from API')
+    def transform(cls, loan_dict):
         cols = set(cls.__table__.c.keys()) - {'country', 'api_response'}
         loan = cls(
             **{col: loan_dict.get(col) for col in cols},
