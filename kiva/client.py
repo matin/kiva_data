@@ -13,9 +13,7 @@ class Resource:
 
     @classmethod
     def retrieve(cls, id_: Union[int, str]) -> Union[None, dict]:
-        url = f'{BASE_URL}/{cls.__resource__}/{id_}.json'
-        resp = requests.get(url)
-        obj_list = resp.json()[cls.__resource__]
+        obj_list = cls.retrieve_ids([id_])
         if not obj_list:
             obj = None
         else:
