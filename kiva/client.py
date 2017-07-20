@@ -1,6 +1,6 @@
 import json
 from json import JSONDecodeError
-from typing import List, Union
+from typing import Union
 
 import requests
 
@@ -12,7 +12,7 @@ class Resource:
     __resource__ = ''
 
     @classmethod
-    def retrieve(cls, id_: Union[int, str]) -> Union[None, dict]:
+    def retrieve(cls, id_) -> Union[None, dict]:
         obj_list = cls.retrieve_ids([id_])
         if not obj_list:
             obj = None
@@ -21,7 +21,7 @@ class Resource:
         return obj
 
     @classmethod
-    def retrieve_ids(cls, ids: Union[List[int], List[str]]) -> list:
+    def retrieve_ids(cls, ids) -> list:
         ids = ','.join(str(id_) for id_ in ids)
         url = f'{BASE_URL}/{cls.__resource__}/{ids}.json'
         resp = requests.get(url)
