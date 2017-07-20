@@ -1,3 +1,5 @@
+import json
+from json import JSONDecodeError
 from typing import List, Union
 
 import requests
@@ -25,7 +27,16 @@ class Resource:
         ids = ','.join(str(id_) for id_ in ids)
         url = f'{BASE_URL}/{cls.__resource__}/{ids}.json'
         resp = requests.get(url)
-        return resp.json()[cls.__resource__]
+        try:
+            resp_dict = resp.json()
+        except JSONDecodeError:
+            resp_json = resp.text.replace('\\', '')
+            resp_dict = json.loads(resp_json)
+        try:
+            obj_list = resp_dict[cls.__resource__]
+        except KeyError:
+            obj_list = []
+        return obj_list
 
 
 class Loan(Resource):

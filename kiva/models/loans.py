@@ -12,11 +12,13 @@ class Loan(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=False)
     activity = Column(String)
+    posted_date = Column(DateTime)
     funded_amount = Column(Integer)
     funded_date = Column(DateTime)
     lender_count = Column(Integer)
     loan_amount = Column(Integer)
     country = Column(String)
+    status = Column(String)
     api_response = Column(String, nullable=False)
 
     @classmethod
@@ -33,13 +35,9 @@ class Loan(Base):
     def _create_from_dict(cls, loan_dict):
         if not loan_dict:
             raise Exception('No data was returned from API')
+        cols = set(cls.__table__.c.keys()) - {'country', 'api_response'}
         loan = cls(
-            id=loan_dict['id'],
-            activity=loan_dict['activity'],
-            funded_amount=loan_dict['funded_amount'],
-            funded_date=loan_dict['funded_date'],
-            lender_count=loan_dict['lender_count'],
-            loan_amount=loan_dict['loan_amount'],
+            **{col: loan_dict.get(col) for col in cols},
             country=loan_dict['location']['country'],
             api_response=json.dumps(loan_dict)
         )
