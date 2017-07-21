@@ -1,5 +1,3 @@
-import json
-
 from sqlalchemy import Column, DateTime, Integer, JSON, String
 
 from .base import Base
