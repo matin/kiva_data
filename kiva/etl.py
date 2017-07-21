@@ -13,7 +13,12 @@ from kiva.models import Loan
 
 APP_ID = os.environ.get('KIVA_APP_ID', '')
 LIMIT = 100
-URL = f'https://api.kivaws.org/v1/loans/{{}}.json?app_id={APP_ID}'
+URL = 'https://api.kivaws.org/v1/loans/{}.json'
+if APP_ID:
+    URL += f'?app_id={APP_ID}'
+    RATE_LIMIT = 500
+else:
+    RATE_LIMIT = 60
 
 
 logger = logging.getLogger('kiva.etl')
@@ -42,7 +47,7 @@ async def retrieve_loans(loan_ids):
 
 
 async def etl_loans(start, end):
-    print(f'Working on {start} => {end}')
+    print(f'Starting {start} => {end}')
     loan_ids = range(start, end + 1)
     loans = await retrieve_loans(loan_ids)
     loans = [Loan.transform(loan) for loan in loans]
@@ -57,7 +62,10 @@ if __name__ == '__main__':
     parser.add_argument('end', type=int)
     args = parser.parse_args()
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(asyncio.gather(*(
-        etl_loans(offset, offset + LIMIT - 1)
-        for offset in range(args.start, args.end, LIMIT)
-    )))
+    group_size = int(RATE_LIMIT / 2)
+    for start in range(args.start, args.end, group_size):
+        end = min(start + group_size, args.end)
+        loop.run_until_complete(asyncio.gather(*(
+            etl_loans(offset, offset + LIMIT - 1)
+            for offset in range(start, end, LIMIT)
+        )))
