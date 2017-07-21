@@ -11,6 +11,9 @@ etl:
 venv:
 		$(PYTHON) -m venv --prompt kiva_data venv
 
+clean:
+		rm -rf venv/
+
 install: venv
 		pip install --quiet --upgrade -r requirements.txt
 

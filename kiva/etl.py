@@ -11,7 +11,7 @@ from kiva import db
 from kiva.models import Loan
 
 
-APP_ID = os.environ.get('KIVA_APP_ID')
+APP_ID = os.environ.get('KIVA_APP_ID', '')
 LIMIT = 100
 URL = f'https://api.kivaws.org/v1/loans/{{}}.json?app_id={APP_ID}'
 
@@ -42,11 +42,13 @@ async def retrieve_loans(loan_ids):
 
 
 async def etl_loans(start, end):
+    print(f'Working on {start} => {end}')
     loan_ids = range(start, end + 1)
     loans = await retrieve_loans(loan_ids)
     loans = [Loan.transform(loan) for loan in loans]
     db.Session.add_all(loans)
     db.Session.commit()
+    print(f'Completed {start} => {end}')
 
 
 if __name__ == '__main__':
