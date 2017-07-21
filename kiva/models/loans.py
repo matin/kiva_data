@@ -1,6 +1,6 @@
 import json
 
-from sqlalchemy import Column, DateTime, Integer, String
+from sqlalchemy import Column, DateTime, Integer, JSON, String
 
 from .base import Base
 
@@ -17,7 +17,7 @@ class Loan(Base):
     loan_amount = Column(Integer)
     country = Column(String)
     status = Column(String)
-    api_response = Column(String, nullable=False)
+    api_response = Column(JSON, nullable=False)
 
     @classmethod
     def transform(cls, loan_dict):
