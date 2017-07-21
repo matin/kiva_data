@@ -29,10 +29,9 @@ async def fetch(session, url):
         return await response.text()
 
 
-async def retrieve_loans(loan_ids):
+async def retrieve_loans(session, loan_ids):
     loan_ids = ','.join(str(loan_id) for loan_id in loan_ids)
-    async with aiohttp.ClientSession() as session:
-        text = await fetch(session, URL.format(loan_ids))
+    text = await fetch(session, URL.format(loan_ids))
     try:
         resp_dict = json.loads(text)
     except JSONDecodeError:
@@ -49,7 +48,8 @@ async def retrieve_loans(loan_ids):
 async def etl_loans(start, end):
     print(f'Starting {start} => {end}')
     loan_ids = range(start, end + 1)
-    loans = await retrieve_loans(loan_ids)
+    async with aiohttp.ClientSession() as session:
+        loans = await retrieve_loans(session, loan_ids)
     loans = [Loan.transform(loan) for loan in loans]
     db.Session.add_all(loans)
     db.Session.commit()
