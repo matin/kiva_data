@@ -62,7 +62,7 @@ if __name__ == '__main__':
     parser.add_argument('end', type=int)
     args = parser.parse_args()
     loop = asyncio.get_event_loop()
-    group_size = int(RATE_LIMIT / 2)
+    group_size = int(RATE_LIMIT / 10)
     for start in range(args.start, args.end, group_size):
         end = min(start + group_size, args.end)
         loop.run_until_complete(asyncio.gather(*(
