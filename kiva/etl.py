@@ -1,6 +1,7 @@
 import argparse
 import asyncio
 import json
+import logging
 from json import JSONDecodeError
 
 import aiohttp
@@ -9,8 +10,12 @@ from kiva import db
 from kiva.models import Loan
 
 
+APP_ID = 'com.mtamizi.kiva'
 LIMIT = 100
-URL = 'https://api.kivaws.org/v1/loans/{}.json'
+URL = f'https://api.kivaws.org/v1/loans/{{}}.json?app_id={APP_ID}'
+
+
+logger = logging.getLogger('kiva.etl')
 
 
 async def fetch(session, url):
@@ -30,6 +35,7 @@ async def retrieve_loans(loan_ids):
     try:
         loans = resp_dict['loans']
     except KeyError:
+        logger.warning(text)
         loans = []
     return loans
 
