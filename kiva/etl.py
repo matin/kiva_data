@@ -2,6 +2,7 @@ import argparse
 import asyncio
 import json
 import logging
+import os
 from json import JSONDecodeError
 
 import aiohttp
@@ -10,7 +11,7 @@ from kiva import db
 from kiva.models import Loan
 
 
-APP_ID = 'com.mtamizi.kiva'
+APP_ID = os.environ.get('KIVA_APP_ID')
 LIMIT = 100
 URL = f'https://api.kivaws.org/v1/loans/{{}}.json?app_id={APP_ID}'
 
