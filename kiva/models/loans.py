@@ -25,6 +25,6 @@ class Loan(Base):
         loan = cls(
             **{col: loan_dict.get(col) for col in cols},
             country=loan_dict['location']['country'],
-            api_response=json.dumps(loan_dict)
+            api_response=loan_dict
         )
         return loan
