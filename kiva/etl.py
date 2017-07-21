@@ -64,7 +64,7 @@ if __name__ == '__main__':
     loop = asyncio.get_event_loop()
     group_size = int(RATE_LIMIT / 10)
     for start in range(args.start, args.end, group_size * LIMIT):
-        end = min(start + LIMIT, args.end)
+        end = min(start + group_size * LIMIT, args.end)
         loop.run_until_complete(asyncio.gather(*(
             etl_loans(offset, offset + LIMIT - 1)
             for offset in range(start, end, LIMIT)
