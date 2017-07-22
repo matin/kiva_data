@@ -8,13 +8,13 @@ class Loan(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=False)
     activity = Column(String)
-    posted_date = Column(DateTime)
-    funded_amount = Column(Integer)
-    funded_date = Column(DateTime)
-    lender_count = Column(Integer)
-    loan_amount = Column(Integer)
-    country = Column(String)
-    status = Column(String)
+    posted_date = Column(DateTime, index=True)
+    funded_amount = Column(Integer, index=True)
+    funded_date = Column(DateTime, index=True)
+    lender_count = Column(Integer, index=True)
+    loan_amount = Column(Integer, index=True)
+    country = Column(String, index=True)
+    status = Column(String, index=True)
     api_response = Column(JSON, nullable=False)
 
     @classmethod
