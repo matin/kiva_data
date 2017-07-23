@@ -15,6 +15,7 @@ class Loan(Base):
     loan_amount = Column(Integer, index=True)
     country = Column(String, index=True)
     status = Column(String, index=True)
+    partner_id = Column(Integer, index=True)
     api_response = Column(JSON, nullable=False)
 
     @classmethod
