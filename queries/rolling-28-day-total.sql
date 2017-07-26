@@ -1,4 +1,3 @@
-copy (
 WITH days AS (
   SELECT generate_series('2005-03-31'::date, '2017-07-21'::date, '1 day')::date AS day
 ), daily_funded_loans AS (
@@ -29,5 +28,4 @@ SELECT
     (ORDER BY day ROWS BETWEEN 27 PRECEDING AND CURRENT ROW)::money amount_funded
 FROM daily_total
 ORDER BY day
-) to '/tmp/rolling-28-day-total.csv' with csv
 ;
