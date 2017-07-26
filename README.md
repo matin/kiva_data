@@ -1,4 +1,4 @@
-# Kiva Data Analyzer
+# Kiva Loan Data Analyzer
 
 Scripts to download Kiva loan data from public API, load in a postgres db,
 and analyze the data.
