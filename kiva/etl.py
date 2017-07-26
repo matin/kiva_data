@@ -20,6 +20,7 @@ if APP_ID:
     RATE_LIMIT = 500
 else:
     RATE_LIMIT = 60
+RATE_LIMIT_FACTOR = 10
 
 
 logger = logging.getLogger('kiva.etl')
@@ -58,14 +59,18 @@ async def etl_loan_slice(start, end):
     print(f'Completed {start} => {end}')
 
 
-def etl_loans(start, end):
+def etl_loans(start=None, end=None):
+    start = start or 0
+    if not end:
+        resp = requests.get(BASE_URL.format('loans/newest'))
+        end = resp.json()['loans'][0]['id']
     loop = asyncio.get_event_loop()
-    group_size = int(RATE_LIMIT / 10)
-    for start in range(start, end, group_size * LIMIT):
-        end = min(start + group_size * LIMIT, args.end)
+    slice_size = int(RATE_LIMIT / RATE_LIMIT_FACTOR)
+    for slice_start in range(start, end, slice_size * LIMIT):
+        slice_end = min(slice_start + slice_size * LIMIT, end)
         loop.run_until_complete(asyncio.gather(*(
             etl_loan_slice(offset, offset + LIMIT - 1)
-            for offset in range(start, end, LIMIT)
+            for offset in range(slice_start, slice_end, LIMIT)
         )))
 
 

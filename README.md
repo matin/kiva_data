@@ -3,6 +3,9 @@
 Scripts to download Kiva loan data from public API, load in a postgres db,
 and analyze the data.
 
+Uses `aiohttp` to speed up downloading. Also attempts to not exceed rate
+limit.
+
 ### Install
 
 `make install`
