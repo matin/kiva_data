@@ -3,3 +3,4 @@ SQLAlchemy
 cchardet
 aiodns
 aiohttp
+requests
