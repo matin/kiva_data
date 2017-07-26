@@ -2,8 +2,8 @@ WITH country_loans AS (
   SELECT
     country,
     sum(funded_amount) funded_amount,
-    avg(funded_amount) average,
-    count(*) total
+    count(*) total,
+    avg(funded_amount) average
   FROM loans
   WHERE
     funded_date BETWEEN '2016-01-01' and '2016-12-31' AND
@@ -22,6 +22,6 @@ SELECT
   cl.average::money,
   (cl.funded_amount / t.funded_amount) percent_of_funded_amount,
   (cl.total / t.total) percent_of_total
-from country_loans cl, total t
-order by total desc
+FROM country_loans cl, total t
+ORDER BY cl.total DESC
 ;
