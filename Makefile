@@ -5,9 +5,6 @@ PYTHON=python3.6
 
 default: install-dev
 
-etl:
-		$(PYTHON) -m kiva.etl
-
 venv:
 		$(PYTHON) -m venv --prompt kiva_data venv
 
