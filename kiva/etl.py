@@ -60,8 +60,14 @@ async def etl_loan_slice(start, end):
 
 
 def etl_loans(start=None, end=None):
-    start = start or 0
-    if not end:
+    if start is None:
+        try:
+            last_loan = Loan.query.order_by(Loan.id.desc())[0]
+        except IndexError:
+            start = 0
+        else:
+            start = last_loan.id + 1
+    if end is None:
         resp = requests.get(BASE_URL.format('loans/newest'))
         end = resp.json()['loans'][0]['id']
     loop = asyncio.get_event_loop()
@@ -83,7 +89,7 @@ def etl_partners():
     db.Session.commit()
 
 
-if __name__ == '__main__':
+def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('resource')
     parser.add_argument('--start', type=int)
@@ -93,3 +99,7 @@ if __name__ == '__main__':
         etl_loans(args.start, args.end)
     elif args.resource == 'partners':
         etl_partners()
+
+
+if __name__ == '__main__':
+    main()
