@@ -8,3 +8,4 @@ class LoanLender(Base):
 
     loan_id = Column(Integer, primary_key=True, autoincrement=False)
     lender_id = Column(String, primary_key=True)
+    filename = Column(String, nullable=False)

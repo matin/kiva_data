@@ -89,13 +89,18 @@ def etl_loan_lenders(dirpath, filename):
         if lender_ids:
             db.Session.add_all(
                 LoanLender(loan_id=loan_lenders['id'],
-                           lender_id=lender_id)
+                           lender_id=lender_id,
+                           filename=filename)
                 for lender_id in lender_ids)
     db.Session.commit()
 
 
 def etl_loans_lenders(dirpath):
-    for filename in os.listdir(dirpath):
+    filenames = set(os.listdir(dirpath))
+    processed_files = db.engine.execute(
+        'SELECT distinct(filename) from loan_lenders')
+    filenames -= {filename[0] for filename in processed_files}
+    for filename in filenames:
         etl_loan_lenders(dirpath, filename)
 
 
