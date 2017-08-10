@@ -86,7 +86,7 @@ def etl_loan_lenders(dirpath, filename):
     with open(os.path.join(dirpath, filename)) as f:
         loans_lenders = json.load(f)['loans_lenders']
     for loan_lenders in loans_lenders:
-        loan_id = loans_lenders['id']
+        loan_id = loan_lenders['id']
         lender_ids = loan_lenders['lender_ids']
         if lender_ids:
             db.Session.add_all(
