@@ -1,6 +1,4 @@
-WITH days AS (
-    SELECT generate_series('2005-03-31' :: DATE, '2017-07-21' :: DATE, '1 day') :: DATE AS day
-), timestamped_lenders AS (
+WITH timestamped_lenders AS (
     SELECT
       ll.lender_id,
       CASE
@@ -32,6 +30,11 @@ WITH days AS (
       count(*) new_lenders
     FROM lenders
     GROUP BY first_loan_on
+), days AS (
+    SELECT generate_series(
+               (SELECT first_loan_on FROM daily_new_lenders ORDER BY first_loan_on LIMIT 1),
+               (SELECT first_loan_on FROM daily_new_lenders ORDER BY first_loan_on DESC LIMIT 1),
+               '1 day') :: DATE AS day
 ), daily_total AS (
     SELECT
       day,
