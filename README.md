@@ -21,3 +21,7 @@ limit.
 ### Loan partners
 
 `python kiva/etl.py partners`
+
+### Load loan_lenders relationships
+
+`python kiva/etl.py loans_lenders --file <path to loans_lenders.json>`
