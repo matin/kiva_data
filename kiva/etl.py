@@ -80,9 +80,9 @@ def etl_loans(start=None, end=None):
         )))
 
 
-async def etl_loan_lenders(dirname, filename):
+def etl_loan_lenders(dirpath, filename):
     print(f'parsing {filename}')
-    with open(os.path.join(dirname, filename)) as f:
+    with open(os.path.join(dirpath, filename)) as f:
         loans_lenders = json.load(f)['loans_lenders']
     for loan_lenders in loans_lenders:
         lender_ids = loan_lenders['lender_ids']
@@ -91,14 +91,12 @@ async def etl_loan_lenders(dirname, filename):
                 LoanLender(loan_id=loan_lenders['id'],
                            lender_id=lender_id)
                 for lender_id in lender_ids)
-        db.Session.commit()
+    db.Session.commit()
 
 
-def etl_loans_lenders(dirname):
-    filenames = os.listdir(dirname)
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(asyncio.gather(*(
-        etl_loan_lenders(dirname, filename) for filename in filenames)))
+def etl_loans_lenders(dirpath):
+    for filename in os.listdir(dirpath):
+        etl_loan_lenders(dirpath, filename)
 
 
 def etl_partners():
@@ -115,12 +113,12 @@ def main():
     parser.add_argument('resource')
     parser.add_argument('--start', type=int)
     parser.add_argument('--end', type=int)
-    parser.add_argument('--dirname')
+    parser.add_argument('--dirpath')
     args = parser.parse_args()
     if args.resource == 'loans':
         etl_loans(args.start, args.end)
     if args.resource == 'loans_lenders':
-        etl_loans_lenders(args.dirname)
+        etl_loans_lenders(args.dirpath)
     elif args.resource == 'partners':
         etl_partners()
 
