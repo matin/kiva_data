@@ -2,6 +2,7 @@ import argparse
 import asyncio
 import json
 import logging
+import re
 import os
 from json import JSONDecodeError
 
@@ -30,6 +31,38 @@ logger = logging.getLogger('kiva.etl')
 async def fetch(session, url):
     async with session.get(url) as response:
         return await response.text()
+
+
+def read_per_char(fp):
+    while True:
+        char = fp.read(1)
+        if not char:
+            break
+        yield char
+
+
+def extract_from_file(filepath):
+    buffer = ''
+    open_braces = 0
+    space_re = re.compile(r'^\s$')
+    with open(filepath) as f:
+        assert f.read(1) == '['
+        for char in read_per_char(f):
+            if char == '{':
+                open_braces += 1
+            elif char == '}':
+                open_braces -= 1
+            buffer += char
+            if not open_braces:
+                if buffer == ',':
+                    pass  # should keep track to make sure JSON is valid
+                elif space_re.match(buffer):
+                    pass
+                elif buffer == ']':
+                    return
+                else:
+                    yield json.loads(buffer)
+                buffer = ''
 
 
 async def retrieve_loans(session, loan_ids):
@@ -81,26 +114,17 @@ def etl_loans(start=None, end=None):
         )))
 
 
-def etl_loan_lenders(dirpath, filename):
-    print(f'working on {filename} ...')
-    with open(os.path.join(dirpath, filename)) as f:
-        loans_lenders = json.load(f)['loans_lenders']
-    for loan_lenders in loans_lenders:
-        db.Session.add_all(LoanLender.transform(loan_lenders, filename))
+def etl_loans_lenders(filepath):
+    # file from:
+    # http://s3.kiva.org.s3.amazonaws.com/snapshots/kiva_ds_json.zip
+    for loan_lenders in extract_from_file(filepath):
+        db.Session.add_all(LoanLender.transform(loan_lenders))
         try:
             db.Session.commit()
         except IntegrityError:
-            logger.error(f'duplicate entries with loan id {loan_id}')
+            logger.error(
+                f"duplicate entries with loan id {loan_lenders['loan_id']}")
             db.Session.rollback()
-
-
-def etl_loans_lenders(dirpath):
-    filenames = set(os.listdir(dirpath))
-    processed_files = db.engine.execute(
-        'SELECT distinct(filename) from loan_lenders')
-    filenames -= {filename[0] for filename in processed_files}
-    for filename in filenames:
-        etl_loan_lenders(dirpath, filename)
 
 
 def etl_partners():
@@ -117,12 +141,12 @@ def main():
     parser.add_argument('resource')
     parser.add_argument('--start', type=int)
     parser.add_argument('--end', type=int)
-    parser.add_argument('--dirpath')
+    parser.add_argument('--file')
     args = parser.parse_args()
     if args.resource == 'loans':
         etl_loans(args.start, args.end)
     if args.resource == 'loans_lenders':
-        etl_loans_lenders(args.dirpath)
+        etl_loans_lenders(args.file)
     elif args.resource == 'partners':
         etl_partners()
 
