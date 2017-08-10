@@ -83,6 +83,7 @@ def etl_loans(start=None, end=None):
 def etl_loans_lenders(dirname):
     filenames = os.listdir(dirname)
     for filename in filenames:
+        print(f'parsing {filename}')
         with open(os.path.join(dirname, filename)) as f:
             loans_lenders = json.load(f)['loans_lenders']
         for loan_lenders in loans_lenders:
