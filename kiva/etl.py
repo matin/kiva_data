@@ -9,7 +9,7 @@ import aiohttp
 import requests
 
 from kiva import db
-from kiva.models import Loan, Partner
+from kiva.models import Loan, LoanLender, Partner
 
 
 APP_ID = os.environ.get('KIVA_APP_ID', '')
@@ -80,6 +80,21 @@ def etl_loans(start=None, end=None):
         )))
 
 
+def etl_loans_lenders(dirname):
+    filenames = os.listdir(dirname)
+    for filename in filenames:
+        with open(os.path.join(dirname, filename)) as f:
+            loans_lenders = json.load(f)['loans_lenders']
+        for loan_lenders in loans_lenders:
+            lender_ids = loan_lenders['lender_ids']
+            if lender_ids:
+                db.Session.add_all(
+                    LoanLender(loan_id=loan_lenders['id'],
+                               lender_id=lender_id)
+                    for lender_id in lender_ids)
+            db.Session.commit()
+
+
 def etl_partners():
     url = BASE_URL.format('partners')
     resp = requests.get(url)
@@ -94,9 +109,12 @@ def main():
     parser.add_argument('resource')
     parser.add_argument('--start', type=int)
     parser.add_argument('--end', type=int)
+    parser.add_argument('--dirname')
     args = parser.parse_args()
     if args.resource == 'loans':
         etl_loans(args.start, args.end)
+    if args.resource == 'loans_lenders':
+        etl_loans_lenders(args.dirname)
     elif args.resource == 'partners':
         etl_partners()
 
