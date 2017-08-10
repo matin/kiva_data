@@ -86,13 +86,7 @@ def etl_loan_lenders(dirpath, filename):
     with open(os.path.join(dirpath, filename)) as f:
         loans_lenders = json.load(f)['loans_lenders']
     for loan_lenders in loans_lenders:
-        loan_id = loan_lenders['id']
-        lender_ids = loan_lenders['lender_ids']
-        if lender_ids:
-            db.Session.add_all(
-                LoanLender(loan_id=loan_id, lender_id=lender_id,
-                           filename=filename)
-                for lender_id in lender_ids)
+        db.Session.add_all(LoanLender.transform(loan_lenders, filename))
         try:
             db.Session.commit()
         except IntegrityError:
