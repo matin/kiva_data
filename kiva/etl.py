@@ -80,20 +80,25 @@ def etl_loans(start=None, end=None):
         )))
 
 
+async def etl_loan_lenders(dirname, filename):
+    print(f'parsing {filename}')
+    with open(os.path.join(dirname, filename)) as f:
+        loans_lenders = json.load(f)['loans_lenders']
+    for loan_lenders in loans_lenders:
+        lender_ids = loan_lenders['lender_ids']
+        if lender_ids:
+            db.Session.add_all(
+                LoanLender(loan_id=loan_lenders['id'],
+                           lender_id=lender_id)
+                for lender_id in lender_ids)
+        db.Session.commit()
+
+
 def etl_loans_lenders(dirname):
     filenames = os.listdir(dirname)
-    for filename in filenames:
-        print(f'parsing {filename}')
-        with open(os.path.join(dirname, filename)) as f:
-            loans_lenders = json.load(f)['loans_lenders']
-        for loan_lenders in loans_lenders:
-            lender_ids = loan_lenders['lender_ids']
-            if lender_ids:
-                db.Session.add_all(
-                    LoanLender(loan_id=loan_lenders['id'],
-                               lender_id=lender_id)
-                    for lender_id in lender_ids)
-            db.Session.commit()
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(asyncio.gather(*(
+        etl_loan_lenders(dirname, filename) for filename in filenames)))
 
 
 def etl_partners():
