@@ -7,6 +7,7 @@ from json import JSONDecodeError
 
 import aiohttp
 import requests
+from sqlalchemy.exc import IntegrityError
 
 from kiva import db
 from kiva.models import Loan, LoanLender, Partner
@@ -85,14 +86,18 @@ def etl_loan_lenders(dirpath, filename):
     with open(os.path.join(dirpath, filename)) as f:
         loans_lenders = json.load(f)['loans_lenders']
     for loan_lenders in loans_lenders:
+        loan_id = loans_lenders['id']
         lender_ids = loan_lenders['lender_ids']
         if lender_ids:
             db.Session.add_all(
-                LoanLender(loan_id=loan_lenders['id'],
-                           lender_id=lender_id,
+                LoanLender(loan_id=loan_id, lender_id=lender_id,
                            filename=filename)
                 for lender_id in lender_ids)
-    db.Session.commit()
+        try:
+            db.Session.commit()
+        except IntegrityError:
+            logger.error(f'duplicate entries with loan id {loan_id}')
+            db.Session.rollback()
 
 
 def etl_loans_lenders(dirpath):
