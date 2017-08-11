@@ -33,12 +33,13 @@ async def fetch(session, url):
         return await response.text()
 
 
-def read_per_char(fp):
+def read_per_char(fp, chunk=4096):
     while True:
-        char = fp.read(1)
-        if not char:
+        buffer = fp.read(chunk)
+        if not buffer:
             break
-        yield char
+        for char in buffer:
+            yield char
 
 
 def extract_from_file(filepath):
