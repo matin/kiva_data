@@ -1,4 +1,3 @@
-copy (
 WITH timestamped_lenders AS (
     SELECT
       ll.lender_id,
@@ -57,5 +56,4 @@ SELECT
     ROWS BETWEEN 27 PRECEDING AND CURRENT ROW ) new_lenders
 FROM daily_total
 ORDER BY day
-) to 'rolling_28_day_new_lenders.csv' with csv
 ;
