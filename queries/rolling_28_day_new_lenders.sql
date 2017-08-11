@@ -32,14 +32,10 @@ WITH timestamped_lenders AS (
     GROUP BY first_loan_on
 ), days AS (
     SELECT generate_series(
-               (SELECT first_loan_on
-                FROM daily_new_lenders
-                ORDER BY first_loan_on
-                LIMIT 1),
-               (SELECT first_loan_on
-                FROM daily_new_lenders
-                ORDER BY first_loan_on DESC
-                LIMIT 1),
+               (SELECT min(first_loan_on)
+                FROM daily_new_lenders),
+               (SELECT max(first_loan_on)
+                FROM daily_new_lenders),
                '1 day') :: DATE AS day
 ), daily_total AS (
     SELECT

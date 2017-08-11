@@ -1,6 +1,4 @@
-WITH days AS (
-    SELECT generate_series('2005-03-31' :: DATE, '2017-07-21' :: DATE, '1 day') :: DATE AS day
-), daily_funded_loans AS (
+WITH daily_funded_loans AS (
     SELECT
       CASE
       WHEN funded_date < '2006-04-19'
@@ -20,6 +18,15 @@ WITH days AS (
         amount_funded
       FROM days
         LEFT JOIN daily_funded_loans ON funded_on = day
+  ),
+    days AS (
+      SELECT generate_series(
+                 (SELECT min(funded_on)
+                  FROM daily_funded_loans),
+                 (SELECT max(funded_on)
+                  FROM daily_funded_loans),
+                 '1 day') :: DATE AS day
+
   )
 SELECT
   day,
