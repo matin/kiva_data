@@ -21,8 +21,7 @@ WITH daily_funded_loans AS (
   ),
     days AS (
       SELECT generate_series(
-                 (SELECT min(funded_on)
-                  FROM daily_funded_loans),
+                 '2005-05-01',
                  (SELECT max(funded_on)
                   FROM daily_funded_loans),
                  '1 day') :: DATE AS day

@@ -32,8 +32,7 @@ WITH timestamped_lenders AS (
     GROUP BY first_loan_on
 ), days AS (
     SELECT generate_series(
-               (SELECT min(first_loan_on)
-                FROM daily_new_lenders),
+               '2005-01-01',
                (SELECT max(first_loan_on)
                 FROM daily_new_lenders),
                '1 day') :: DATE AS day
