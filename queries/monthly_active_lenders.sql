@@ -16,7 +16,7 @@ WITH funded_loans AS (
       JOIN loan_lenders ll ON ll.loan_id = fl.id
 ), months AS (
     SELECT generate_series(
-               '2005-05-01',
+               '2006-06-01',
                (SELECT max(funded_on)
                 FROM funded_loans),
                '1 month') :: DATE AS month
