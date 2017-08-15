@@ -22,11 +22,11 @@ SELECT
   pl.partner_id,
   pl.partner_name,
   pl.country,
-  pl.funded_amount :: MONEY,
-  pl.total,
+  pl.funded_amount,
+  pl.total                             number_funded,
   pl.average,
   (pl.funded_amount / t.funded_amount) percent_of_funded_amount,
-  (pl.total / t.total)                 percent_of_total
+  (pl.total / t.total)                 percent_of_number_funded
 FROM partner_loans pl, total t
 ORDER BY pl.total DESC
 ;

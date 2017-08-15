@@ -44,7 +44,7 @@ WITH timestamped_lenders AS (
       LEFT JOIN daily_new_lenders ON first_loan_on = day
 )
 SELECT
-  day,
+  day AS                                        "date",
   sum(new_lenders)
   OVER (
     ORDER BY day

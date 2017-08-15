@@ -17,9 +17,9 @@ WITH country_loans AS (
 )
 SELECT
   cl.country,
-  cl.funded_amount :: MONEY,
+  cl.funded_amount,
   cl.total,
-  cl.average :: MONEY,
+  cl.average,
   (cl.funded_amount / t.funded_amount) percent_of_funded_amount,
   (cl.total / t.total)                 percent_of_total
 FROM country_loans cl, total t

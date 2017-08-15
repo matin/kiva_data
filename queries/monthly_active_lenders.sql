@@ -22,10 +22,10 @@ WITH funded_loans AS (
                '1 month') :: DATE AS month
 )
 SELECT
-  month AS Month,
+  month,
   (SELECT count(DISTINCT lender_id)
    FROM lender_lended_on
    WHERE funded_on >= month AND funded_on < month + INTERVAL '1 month'
-  )     AS "Active Lenders"
+  ) active_lenders
 FROM months
 ;
