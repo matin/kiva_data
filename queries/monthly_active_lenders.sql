@@ -14,18 +14,18 @@ WITH funded_loans AS (
       ll.lender_id
     FROM funded_loans fl
       JOIN loan_lenders ll ON ll.loan_id = fl.id
-), days AS (
+), months AS (
     SELECT generate_series(
-               (SELECT min(funded_on)
-                FROM funded_loans),
+               '2005-05-01',
                (SELECT max(funded_on)
                 FROM funded_loans),
-               '1 day') :: DATE AS day
+               '1 month') :: DATE AS month
 )
 SELECT
-  day,
+  month AS Month,
   (SELECT count(DISTINCT lender_id)
    FROM lender_lended_on
-   WHERE funded_on BETWEEN day - INTERVAL '30 days' AND day)
-FROM days
+   WHERE funded_on >= month AND funded_on < month + INTERVAL '1 month'
+  )     AS "Active Lenders"
+FROM months
 ;
